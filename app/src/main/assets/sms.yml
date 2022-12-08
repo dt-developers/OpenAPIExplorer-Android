@@ -1,0 +1,123 @@
+openapi: 3.0.0
+info:
+  title: Programmable Communications SMS API
+  version: 1.1.0
+  contact:
+    name: T Developers Support
+    email: developers@telekom.de
+    url: https://developer.telekom.com
+  termsOfService: https://developer.telekom.com/terms-and-conditions
+  description: DT Programmable Communications API based on the documentation available at https://developer.telekom.com/products/sms-api.
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+paths:
+  /messages:
+    post:
+      summary: Send a SMS message.
+      description: Sends a new SMS and returns its representation.
+      operationId: post-sms-messages
+      responses:
+        '200':
+          $ref: '#/components/responses/send-sms-response'
+      requestBody:
+        $ref: '#/components/requestBodies/send-sms-request'
+  /messages/{messageId}:
+    parameters:
+      - schema:
+          type: string
+          pattern: '^[0-9a-f]*$'
+        name: messageId
+        in: path
+        required: true
+        description: The id of the message to be retrieved.
+    get:
+      summary: Get single SMS information.
+      responses:
+        '200':
+          $ref: '#/components/responses/send-sms-response'
+      operationId: get-sms-messages-messageId
+      description: Get single SMS information.
+components:
+  securitySchemes:
+    auth:
+      name: X-API-Key
+      type: apiKey
+      in: header
+  requestBodies:
+    send-sms-request:
+      content:
+        application/x-www-form-urlencoded:
+          schema:
+            type: object
+            additionalProperties: false
+            properties:
+              From:
+                type: string
+                description: Telephone number in E.164 format, Sender ID, or short code.
+                example: '+19876543212'
+                maxLength: 14
+              To:
+                type: string
+                pattern: '^\+[1-9]\d{1,14}$'
+                description: Telephone number in E.164 format.
+                example: '+19876543212'
+                maxLength: 14
+              Body:
+                type: string
+                description: Text body of the SMS message.
+                example: Test SMS
+              StatusCallback:
+                type: string
+                description: A URL to send a webhook requests to notify on any message status event.
+                example: 'http://status.callback.url'
+                nullable: true
+            required:
+              - From
+              - To
+              - Body
+      description: Format of Send SMS request.
+  responses:
+    send-sms-response:
+      description: Format of Send SMS response.
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              sid:
+                type: string
+                description: SMS message identifier.
+              date_created:
+                type: string
+              date_updated:
+                type: string
+              from:
+                type: string
+              to:
+                type: string
+              body:
+                type: string
+              status:
+                type: string
+              direction:
+                type: string
+              api_version:
+                type: string
+              uri:
+                type: string
+          examples:
+            example:
+              value:
+                sid: 6362552fc8f06f1a9884030b
+                date_created: 'Fri, 23 Sep 2022 11:42:37 +0100'
+                date_updated: 'Fri, 23 Sep 2022 11:42:39 +0100'
+                from: '+19876543212'
+                to: '+13216549878'
+                body: Test SMS
+                status: accepted
+                direction: outbound-api
+                api_version: 1.1.0
+                uri: /service/sms/v1/messages/6362552fc8f06f1a9884030b
+servers:
+  - url: 'https://api.developer.telekom.com/service/sms/v1'

@@ -1,0 +1,2465 @@
+openapi: 3.0.0
+info:
+  title: The Cat API
+  description: >-
+    ![image](https://cdn2.thecatapi.com/logos/thecatapi_256xW.png)
+
+
+    ## An open, free, read & write API all about Cats
+
+    The Cat API gives you access to 10000's of cat images
+
+    - Upload your own images
+
+    - Favourite or Vote on images
+
+    - Get stats on your requests
+
+    - Save a custom value with each request for each of your users
+
+
+    ## How is this free?
+
+    My goal is to create free, fun & useful public service API's, helping people
+    learn to code, create awesome projects, and be a stable fixture in a
+    turbulent world.
+
+
+    ## How do i get access?
+
+    Just signup for an API Key from https://theCatAPI.com for free. I'm looking
+    forward to seeing what you make!
+  version: 1.0.0
+servers:
+  - url: http://{{endpoint}}v1
+  - url: http://{{endpoint}}
+components:
+  securitySchemes:
+    noauthAuth:
+      type: http
+      scheme: noauth
+tags:
+  - name: Images
+    description: |-
+      With /images routes you can:
+      - Search for any images
+      - Itterate through all the images by order DESC or ASC
+      - Get individual images
+      - Upload your own images
+      - Get the results of any analysis performed when the image was uploaded
+  - name: Favourites
+    description: >-
+      These routes allow you to Favourite any image, or use a sub_id to
+      favourite images for each of your users.
+  - name: Votes
+    description: >-
+      These routes allow you to Vote any image Up or Down (value=1 or value=0).
+      You can use a sub_id to let each of your users Vote, and get Votes
+      filtered by that sub_id.
+  - name: Categories
+  - name: Breeds
+  - name: Sources
+paths:
+  /images/search:
+    get:
+      tags:
+        - Images
+      summary: /images/search
+      description: >-
+        #### Route
+
+
+        https://api.thecatapi.com/v1/images/search
+
+
+        Search & Itterate through all approved images.
+
+
+
+        #### Query Parameters
+
+
+        | Key  | Required |
+        Description                                                                                    
+        |
+
+        |------|----------|-------------------------------------------------------------------------------------------------|
+
+        | size | optional | The size of image to return - `small`, `med` or
+        `full`. `small` is perfect for Discord. Defaults to `med`
+
+        | mime_types | optional | Comma delimited string of the image types to
+        return `gif`, `jpg`, or`png`. Defaults to return all types
+        `jpg,gif,png`.                                                    |
+
+        | format | optional | Response format `json`, or`src`. `src` will
+        redirect straight to the image, so is useful for putting a link straight
+        into HTML as the 'src' on an 'img' tag. Defaults to
+        `json`                            |
+
+        | order | optional | The order to return results in. `RANDOM`, `ASC` or
+        `DESC`. If either `ASC` or `DESC` is passed then the Pagination headers
+        will be on the response allowing you to see the total amount of results,
+        and your current page. Default is `RANDOM`                      |
+
+        | page | optional | Integer - used for Paginating through all the
+        results. Only used when order is `ASC` or `DESC`                      |
+
+        | limit | optional | Integer - number of results to return. Without an
+        API Key you can only pass `1`, with a Key you can pass up to `25`.
+        Default is `1`                      |
+
+        | category_ids | optional | Comma delimited string of integers, matching
+        the `id`'s of the Categories to filter the search. These categories can
+        found in the `/v1/categories` request. e.g.
+        category_ids=2                      |
+
+        | breed_ids | optional | Comma delimited string of integers, matching
+        the `id`'s of the Breeds to filter the search. These categories can
+        found in the `/v1/breeds` request                      |
+
+        | has_breeds | optional | Only return images which have breed data
+        attached. Integer - `0` or `1`. Default is `0`                        |
+
+
+        #### Pagination
+
+        If order=ASC or order=DESC is passed, then the response will contain
+        these values as Headers
+
+
+        | Key  |
+        Description                                                                                    
+        |
+
+        |------|-------------------------------------------------------------------------------------------------|
+
+        | Pagination-Count | Integer - the total amount of results matching your
+        search|
+
+        | Pagination-Page  | Integer - the current page
+
+        | Pagination-Limit | Integer - amount of results being returned per page
+
+        |
+      security:
+        - noauthAuth: []
+      parameters:
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+        - name: x-api-key
+          in: header
+          schema:
+            type: string
+          description: '[optional] without it only the a basic set of images can be searched'
+          example: '{{YOUR-API-KEY}}'
+        - name: breed_ids
+          in: query
+          schema:
+            type: string
+          description: '[optional] breed ids from /breeds route'
+          example: beng
+        - name: include_breeds
+          in: query
+          schema:
+            type: boolean
+          description: '[optional] true/false - Include the ''breeds'' array - default true'
+          example: 'true'
+      responses:
+        '200':
+          description: OK
+          headers:
+            Date:
+              schema:
+                type: string
+                example: Sat, 03 Nov 2018 05:47:06 GMT
+            Content-Type:
+              schema:
+                type: string
+                example: application/json; charset=utf-8
+            Transfer-Encoding:
+              schema:
+                type: string
+                example: chunked
+            Connection:
+              schema:
+                type: string
+                example: keep-alive
+            Server:
+              schema:
+                type: number
+                example: nginx/1.12.1
+            X-DNS-Prefetch-Control:
+              schema:
+                type: string
+                example: 'off'
+            X-Frame-Options:
+              schema:
+                type: string
+                example: SAMEORIGIN
+            Strict-Transport-Security:
+              schema:
+                type: string
+                example: max-age=15552000; includeSubDomains
+            X-Download-Options:
+              schema:
+                type: string
+                example: noopen
+            X-Content-Type-Options:
+              schema:
+                type: string
+                example: nosniff
+            X-XSS-Protection:
+              schema:
+                type: string
+                example: 1; mode=block
+            Vary:
+              schema:
+                type: string
+                example: Origin
+            Expires:
+              schema:
+                type: string
+                example: Tue, 03 Jul 2001 06:00:00 GMT
+            Last-Modified:
+              schema:
+                type: string
+                example: Sat Nov 03 2018 05:47:06 GMT+0000 (UTC)
+            Cache-Control:
+              schema:
+                type: string
+                example: post-check=0, pre-check=0
+            Pagination-Count:
+              schema:
+                type: integer
+                example: '20713'
+            Pagination-Page:
+              schema:
+                type: integer
+                example: '0'
+            Pagination-Limit:
+              schema:
+                type: integer
+                example: '10'
+            Access-Control-Expose-Headers:
+              schema:
+                type: string
+                example: Pagination-Count, Pagination-Page, Pagination-Limit
+            X-Response-Time:
+              schema:
+                type: string
+                example: 68ms
+            Content-Encoding:
+              schema:
+                type: string
+                example: gzip
+          content:
+            application/json:
+              schema:
+                type: object
+              examples:
+                example-0:
+                  summary: /images/search - 10 random images
+                  value:
+                    - breeds: []
+                      categories: []
+                      id: e3c
+                      url: >-
+                        https://25.media.tumblr.com/tumblr_m1yuqjfdy31qejbiro1_500.jpg
+                    - breeds: []
+                      categories: []
+                      id: 2kj
+                      url: >-
+                        https://25.media.tumblr.com/tumblr_m2frwgKzN01r6b7kmo1_500.jpg
+                    - breeds: []
+                      categories: []
+                      id: MTYzMjIxMA
+                      url: >-
+                        https://25.media.tumblr.com/tumblr_maklk6AJiw1qhwmnpo1_400.jpg
+                    - breeds: []
+                      categories: []
+                      id: ckk
+                      url: https://cdn2.thecatapi.com/images/ckk.gif
+                    - breeds: []
+                      categories: []
+                      id: ea7
+                      url: >-
+                        https://25.media.tumblr.com/tumblr_m4qyhzpZts1qcxyrro1_500.jpg
+                    - breeds: []
+                      categories: []
+                      id: 4m5
+                      url: >-
+                        https://25.media.tumblr.com/tumblr_m44w9nI50Y1qzyqubo1_500.jpg
+                    - breeds: []
+                      categories: []
+                      id: fb
+                      url: >-
+                        https://25.media.tumblr.com/tumblr_luihyxjWY51qzqffro1_500.jpg
+                    - breeds: []
+                      categories: []
+                      id: MTg5NzY0OQ
+                      url: >-
+                        https://24.media.tumblr.com/tumblr_m87t24YOrf1qze0hyo1_500.jpg
+                    - breeds: []
+                      categories: []
+                      id: bmf
+                      url: >-
+                        https://24.media.tumblr.com/tumblr_ltq345HHij1qh9eixo1_500.png
+                    - breeds: []
+                      categories: []
+                      id: 88n
+                      url: https://cdn2.thecatapi.com/images/88n.gif
+                example-1:
+                  summary: /images/search
+                  value:
+                    - id: 3fg
+                      url: >-
+                        https://25.media.tumblr.com/tumblr_lqik92AS4I1qfy8klo1_500.jpg
+                      breeds: []
+                      categories: []
+  /images/{image_id}:
+    get:
+      tags:
+        - Images
+      summary: /images/:image_id - (Individual Image)
+      description: |-
+        #### Route
+
+        https://api.thecatapi.com/v1/images/:image_id
+      security:
+        - noauthAuth: []
+      parameters:
+        - name: x-api-key
+          in: header
+          schema:
+            type: string
+          description: |
+            [optional]  will save this request to your account analytics
+          example: '{{YOUR-API-KEY}}'
+        - name: sub_id
+          in: query
+          schema:
+            type: string
+          description: '[optional] if you want to save this request to your account stats'
+        - name: size
+          in: query
+          schema:
+            type: string
+          description: '[optional] thumb , small, med or full - small is perfect for Discord'
+        - name: include_vote
+          in: query
+          schema:
+            type: string
+          description: >-
+            [optional] include the last Vote for the Image from your account &
+            sub_id
+        - name: include_favourite
+          in: query
+          schema:
+            type: string
+          description: >-
+            [optional] include the Favourite for the Image from your account &
+            sub_id
+        - name: image_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: The id of the image to get
+          example: MjAzMDMwMg
+      responses:
+        '200':
+          description: OK
+          headers:
+            Connection:
+              schema:
+                type: string
+                example: keep-alive
+            Content-Length:
+              schema:
+                type: integer
+                example: '158'
+            Content-Type:
+              schema:
+                type: string
+                example: application/json; charset=utf-8
+            Date:
+              schema:
+                type: string
+                example: Sun, 13 May 2018 11:59:07 GMT
+            Vary:
+              schema:
+                type: string
+                example: Origin
+            X-Response-Time:
+              schema:
+                type: string
+                example: 71ms
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                id: BkIEhN3pG
+                url: ''
+                width: 912
+                height: 1024
+                mime_type: image/jpeg
+                breeds:
+                  - id: 10
+                    name: American Bulldog
+                categories: []
+                breed_ids: '10'
+    delete:
+      tags:
+        - Images
+      summary: /images/:image_id
+      description: Delete any image you uploaded.
+      security:
+        - noauthAuth: []
+      parameters:
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+        - name: x-api-key
+          in: header
+          schema:
+            type: string
+          example: example-api-key-for-your-account
+        - name: image_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: The id of the image to delete
+          example: '{{image_id}}'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /images/:
+    get:
+      tags:
+        - Images
+      summary: /images/ (Your uploads)
+      description: >-
+        Returns the images from your account you uploaded via
+        `/v1/images/upload`
+
+
+
+        #### Route
+
+
+        https://api.thecatapi.com/v1/images/
+
+
+
+        #### Pagination
+
+        If order=ASC or order=DESC is passed, then the response will contain
+        these values as Headers
+
+
+        | Key  |
+        Description                                                                                    
+        |
+
+        |------|-------------------------------------------------------------------------------------------------|
+
+        | Pagination-Count | Integer - the total amount of results matching your
+        search|
+
+        | Pagination-Page  | Integer - the current page
+
+        | Pagination-Limit | Integer - amount of results being returned per page
+
+        |
+      security:
+        - noauthAuth: []
+      parameters:
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+        - name: x-api-key
+          in: header
+          schema:
+            type: string
+          required: true
+          description: |
+            - will return all the images from your account
+          example: '{{YOUR-API-KEY}}'
+        - name: limit
+          in: query
+          schema:
+            type: integer
+          description: '[Optional] number of images to return valid  1 to 10 - default: 1'
+          example: '10'
+        - name: page
+          in: query
+          schema:
+            type: integer
+          description: >-
+            [Optional] only works if account_id is present to page through your
+            own uploads
+          example: '0'
+        - name: order
+          in: query
+          schema:
+            type: string
+          description: >-
+            [Optional] only works if account_id is present, either ASC or DESC -
+            ascending or descending.
+          example: DESC
+        - name: sub_id
+          in: query
+          schema:
+            type: string
+          description: '[Optional] If you want to '
+          example: user1
+        - name: breed_ids
+          in: query
+          schema:
+            type: string
+          description: '[Optional] Id''s of the breeds to filter by'
+          example: 1,4,28
+        - name: category_ids
+          in: query
+          schema:
+            type: integer
+          description: '[Optional] Id''s of the categories to filter by'
+          example: '4'
+        - name: format
+          in: query
+          schema:
+            type: string
+          description: >-
+            [Optional] default is 'json', pass 'src' to redirect the request to
+            the image's url - this is useful for setting the 'src' of an <img>
+            tag.
+          example: json
+        - name: original_filename
+          in: query
+          schema:
+            type: string
+          description: '[Optional] filter to files you uploaded with the same name'
+      responses:
+        '200':
+          description: OK
+          headers:
+            connection:
+              schema:
+                type: string
+                example: keep-alive
+            content-length:
+              schema:
+                type: integer
+                example: '2495'
+            content-type:
+              schema:
+                type: string
+                example: application/json; charset=utf-8
+            date:
+              schema:
+                type: string
+                example: Wed, 11 Apr 2018 12:37:55 GMT
+            vary:
+              schema:
+                type: string
+                example: Origin
+            x-response-time:
+              schema:
+                type: string
+                example: 110ms
+          content:
+            application/json:
+              schema:
+                type: object
+              examples:
+                example-0:
+                  summary: /images/
+                  value:
+                    - id: S1bsCGxrf
+                      url: >-
+                        http://78.media.tumblr.com/2bc94b9eec2d00f5d28110ba191da896/tumblr_nyled8DYKd1qg9kado1_1280.jpg
+                      width: null
+                      height: null
+                      mime_type: image/jpeg
+                      entities: []
+                      breeds:
+                        - id: 3
+                          name: Alaskan Malamute
+                          wikipedia_url: https://en.wikipedia.org/wiki/Alaskan_Malamute
+                        - id: 2
+                          name: Akita
+                          wikipedia_url: https://en.wikipedia.org/wiki/Akita_(dog)
+                      animals: []
+                      categories: []
+                    - id: B1gZsCMgrG
+                      url: >-
+                        http://78.media.tumblr.com/75f7f5ba97da53c61026fe6cad16c97c/tumblr_o8h7llrbDt1rzz2who1_1280.jpg
+                      width: null
+                      height: null
+                      mime_type: image/jpeg
+                      entities: []
+                      breeds: []
+                      animals: []
+                      categories: []
+                    - id: HJZWiCGgSf
+                      url: >-
+                        http://78.media.tumblr.com/84f729a7130860dda9b7544664a36094/tumblr_nvgiskSmew1un7zabo3_r1_1280.jpg
+                      width: null
+                      height: null
+                      mime_type: image/jpeg
+                      entities: []
+                      breeds: []
+                      animals: []
+                      categories: []
+                    - id: HyGWiRfgBM
+                      url: >-
+                        http://78.media.tumblr.com/6fb13a48907b7d65f79a07afdc9c5ebe/tumblr_nhlytoREfQ1rvsh0oo1_1280.jpg
+                      width: null
+                      height: null
+                      mime_type: image/jpeg
+                      entities: []
+                      breeds: []
+                      animals: []
+                      categories: []
+                    - id: Bk4-oAzlHM
+                      url: >-
+                        http://78.media.tumblr.com/4217786db510db68daed375cea8ec4d9/tumblr_nlf1ggSff71ruv93po1_1280.jpg
+                      width: null
+                      height: null
+                      mime_type: image/jpeg
+                      entities: []
+                      breeds: []
+                      animals: []
+                      categories: []
+                    - id: H1HWiCMxHG
+                      url: >-
+                        http://78.media.tumblr.com/a9c056e66b11e1a91a9a03d8c0d04e89/tumblr_o7uwyquvpM1qjcdw9o1_1280.png
+                      width: null
+                      height: null
+                      mime_type: image/png
+                      entities: []
+                      breeds: []
+                      animals: []
+                      categories: []
+                    - id: rkUZsAGeHM
+                      url: >-
+                        http://78.media.tumblr.com/9666e3107587fa2dd7833033ec42b7ba/tumblr_o0ymimYfp71rozzl0o1_1280.jpg
+                      width: null
+                      height: null
+                      mime_type: image/jpeg
+                      entities: []
+                      breeds: []
+                      animals: []
+                      categories: []
+                    - id: BkDZjRzlSz
+                      url: >-
+                        http://78.media.tumblr.com/9b5ed3d0bcd102bb028f137267082777/tumblr_o6zaks1SvQ1qjcdw9o1_1280.jpg
+                      width: null
+                      height: null
+                      mime_type: image/jpeg
+                      entities: []
+                      breeds: []
+                      animals: []
+                      categories: []
+                    - id: ByuZj0GgBf
+                      url: >-
+                        http://78.media.tumblr.com/766f297cf8b282cd2820fc4c9161c328/tumblr_o7hktkxin01qjcdw9o1_1280.jpg
+                      width: null
+                      height: null
+                      mime_type: image/jpeg
+                      entities: []
+                      breeds: []
+                      animals: []
+                      categories: []
+                    - id: r1tWjAfxHz
+                      url: >-
+                        http://78.media.tumblr.com/5230380780945425e867a0a3aaa6f4b0/tumblr_n8w47dGOhd1r7qbtpo1_1280.jpg
+                      width: null
+                      height: null
+                      mime_type: image/jpeg
+                      entities: []
+                      breeds: []
+                      animals: []
+                      categories: []
+                example-1:
+                  summary: /images/
+                  value:
+                    - id: SJ6YQ-mRf
+                      url: http://cdn1.thedogapi.com/images/SJ6YQ-mRf.gif
+                      width: 330
+                      height: 186
+                      mime_type: image/gif
+                      sub_id: tumblr_p7pc03uDYD1vb46leo1_400.gif
+                      created_at: '2018-05-11T01:50:29.000Z'
+                      breed_ids: null
+                      category_ids: null
+                      original_filename: tumblr_p7pc03uDYD1vb46leo1_400.gif
+                    - id: r1EP7WmRM
+                      url: http://cdn1.thedogapi.com/images/r1EP7WmRM.gif
+                      width: 344
+                      height: 344
+                      mime_type: image/gif
+                      sub_id: tumblr_p7et7dDbvt1vb46leo1_400.gif
+                      created_at: '2018-05-11T01:49:48.000Z'
+                      breed_ids: null
+                      category_ids: null
+                      original_filename: tumblr_p7et7dDbvt1vb46leo1_400.gif
+                    - id: SJ9Nm-m0z
+                      url: http://cdn1.thedogapi.com/images/SJ9Nm-m0z.gif
+                      width: 323
+                      height: 323
+                      mime_type: image/gif
+                      sub_id: tumblr_p7anz8xrxY1vb46leo1_400.gif
+                      created_at: '2018-05-11T01:49:06.000Z'
+                      breed_ids: null
+                      category_ids: null
+                      original_filename: tumblr_p7anz8xrxY1vb46leo1_400.gif
+                    - id: HkWzmb7RG
+                      url: http://cdn1.thedogapi.com/images/HkWzmb7RG.gif
+                      width: 402
+                      height: 402
+                      mime_type: image/gif
+                      sub_id: tumblr_p66rh3yOQZ1vb46leo1_500.gif
+                      created_at: '2018-05-11T01:48:24.000Z'
+                      breed_ids: null
+                      category_ids: null
+                      original_filename: tumblr_p66rh3yOQZ1vb46leo1_500.gif
+                    - id: BJNJ7-XCM
+                      url: http://cdn1.thedogapi.com/images/BJNJ7-XCM.gif
+                      width: 328
+                      height: 340
+                      mime_type: image/gif
+                      sub_id: tumblr_p5x7l8Npvd1vb46leo1_400.gif
+                      created_at: '2018-05-11T01:47:40.000Z'
+                      breed_ids: null
+                      category_ids: null
+                      original_filename: tumblr_p5x7l8Npvd1vb46leo1_400.gif
+                    - id: Byd3G-7Cz
+                      url: http://cdn1.thedogapi.com/images/Byd3G-7Cz.gif
+                      width: 295
+                      height: 275
+                      mime_type: image/gif
+                      sub_id: tumblr_p5bw97ms4S1tlb56zo1_400.gif
+                      created_at: '2018-05-11T01:46:55.000Z'
+                      breed_ids: null
+                      category_ids: null
+                      original_filename: tumblr_p5bw97ms4S1tlb56zo1_400.gif
+                    - id: SyhKGWXRz
+                      url: http://cdn1.thedogapi.com/images/SyhKGWXRz.gif
+                      width: 240
+                      height: 300
+                      mime_type: image/gif
+                      sub_id: tumblr_p4v52oRLhQ1tlb56zo1_250.gif
+                      created_at: '2018-05-11T01:46:11.000Z'
+                      breed_ids: null
+                      category_ids: null
+                      original_filename: tumblr_p4v52oRLhQ1tlb56zo1_250.gif
+                    - id: BJWwzW7Rz
+                      url: http://cdn1.thedogapi.com/images/BJWwzW7Rz.gif
+                      width: 400
+                      height: 442
+                      mime_type: image/gif
+                      sub_id: tumblr_p4ue73GTqE1ry46hlo1_400.gif
+                      created_at: '2018-05-11T01:45:29.000Z'
+                      breed_ids: null
+                      category_ids: null
+                      original_filename: tumblr_p4ue73GTqE1ry46hlo1_400.gif
+                    - id: ryrVzZ7RM
+                      url: http://cdn1.thedogapi.com/images/ryrVzZ7RM.gif
+                      width: 350
+                      height: 197
+                      mime_type: image/gif
+                      sub_id: tumblr_ou6lq9N06K1vb46leo1_400.gif
+                      created_at: '2018-05-11T01:44:45.000Z'
+                      breed_ids: null
+                      category_ids: null
+                      original_filename: tumblr_ou6lq9N06K1vb46leo1_400.gif
+                    - id: r1F-fZQCf
+                      url: http://cdn1.thedogapi.com/images/r1F-fZQCf.gif
+                      width: 460
+                      height: 263
+                      mime_type: image/gif
+                      sub_id: tumblr_otdzzy1qvE1vnq1cro2_500.gif
+                      created_at: '2018-05-11T01:44:00.000Z'
+                      breed_ids: null
+                      category_ids: null
+                      original_filename: tumblr_otdzzy1qvE1vnq1cro2_500.gif
+  /images/upload:
+    post:
+      tags:
+        - Images
+      summary: /images/upload
+      description: >+
+        #### Route
+
+
+        https://api.thecatapi.com/v1/images/upload
+
+
+        Upload your own Cat pictures. Anything that doesn't contain a cat, or
+        contains anything inappropriate will be rejected.
+
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  description: File on your local machine
+                  format: binary
+                sub_id:
+                  type: string
+                  description: >-
+                    [optional] - a string you can use to segment your images,
+                    e.g. knowing which of your own users uploaded it.
+      security:
+        - noauthAuth: []
+      parameters:
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: multipart/form-data
+        - name: x-api-key
+          in: header
+          schema:
+            type: string
+          required: true
+          description: '- saves the uploaded image to your account.'
+          example: '{{YOUR-API-KEY}}'
+      responses:
+        '200':
+          description: OK
+          headers:
+            Date:
+              schema:
+                type: string
+                example: Thu, 08 Nov 2018 10:12:33 GMT
+            Content-Type:
+              schema:
+                type: string
+                example: application/json; charset=utf-8
+            Transfer-Encoding:
+              schema:
+                type: string
+                example: chunked
+            Connection:
+              schema:
+                type: string
+                example: keep-alive
+            Server:
+              schema:
+                type: number
+                example: nginx/1.12.1
+            X-DNS-Prefetch-Control:
+              schema:
+                type: string
+                example: 'off'
+            X-Frame-Options:
+              schema:
+                type: string
+                example: SAMEORIGIN
+            Strict-Transport-Security:
+              schema:
+                type: string
+                example: max-age=15552000; includeSubDomains
+            X-Download-Options:
+              schema:
+                type: string
+                example: noopen
+            X-Content-Type-Options:
+              schema:
+                type: string
+                example: nosniff
+            X-XSS-Protection:
+              schema:
+                type: string
+                example: 1; mode=block
+            Vary:
+              schema:
+                type: string
+                example: Origin
+            X-Response-Time:
+              schema:
+                type: string
+                example: 3605ms
+            Content-Encoding:
+              schema:
+                type: string
+                example: gzip
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                id: 9ccXTANkb
+                url: https://cdn2.thecatapi.com/images/9ccXTANkb.jpg
+                pending: 0
+                approved: 1
+  /images/upload2:
+    post:
+      tags:
+        - Images
+      summary: /images/upload2 for testing theImageAPI integration
+      description: >+
+        #### Route
+
+
+        https://api.thecatapi.com/v1/images/upload
+
+
+        Upload your own Cat pictures. Anything that doesn't contain a cat, or
+        contains anything inappropriate will be rejected.
+
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  description: File on your local machine
+                  format: binary
+                sub_id:
+                  type: string
+                  description: >-
+                    [optional] - a string you can use to segment your images,
+                    e.g. knowing which of your own users uploaded it.
+      security:
+        - noauthAuth: []
+      parameters:
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: multipart/form-data
+        - name: x-api-key
+          in: header
+          schema:
+            type: string
+          required: true
+          description: '- saves the uplaoded image to your account.'
+          example: '{{YOUR-API-KEY}}'
+      responses:
+        '200':
+          description: OK
+          headers:
+            Date:
+              schema:
+                type: string
+                example: Thu, 08 Nov 2018 10:12:33 GMT
+            Content-Type:
+              schema:
+                type: string
+                example: application/json; charset=utf-8
+            Transfer-Encoding:
+              schema:
+                type: string
+                example: chunked
+            Connection:
+              schema:
+                type: string
+                example: keep-alive
+            Server:
+              schema:
+                type: number
+                example: nginx/1.12.1
+            X-DNS-Prefetch-Control:
+              schema:
+                type: string
+                example: 'off'
+            X-Frame-Options:
+              schema:
+                type: string
+                example: SAMEORIGIN
+            Strict-Transport-Security:
+              schema:
+                type: string
+                example: max-age=15552000; includeSubDomains
+            X-Download-Options:
+              schema:
+                type: string
+                example: noopen
+            X-Content-Type-Options:
+              schema:
+                type: string
+                example: nosniff
+            X-XSS-Protection:
+              schema:
+                type: string
+                example: 1; mode=block
+            Vary:
+              schema:
+                type: string
+                example: Origin
+            X-Response-Time:
+              schema:
+                type: string
+                example: 3605ms
+            Content-Encoding:
+              schema:
+                type: string
+                example: gzip
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                id: 9ccXTANkb
+                url: https://cdn2.thecatapi.com/images/9ccXTANkb.jpg
+                pending: 0
+                approved: 1
+  /images/{image_id}/analysis:
+    get:
+      tags:
+        - Images
+      summary: /images/:image_id/analysis
+      description: >-
+        Get the analysis of any images you uploaded.
+
+
+        Warning: the response format will change in the future as the Analysis
+        engine improves.
+      security:
+        - noauthAuth: []
+      parameters:
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          description: x-
+          example: application/json
+        - name: x-api-key
+          in: header
+          schema:
+            type: string
+          example: '{{YOUR-API-KEY}}'
+        - name: image_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: >-
+            Id of the image to return any analysis performed on it during
+            upload.
+          example: 9ccXTANkb
+      responses:
+        '200':
+          description: OK
+          headers:
+            Date:
+              schema:
+                type: string
+                example: Thu, 08 Nov 2018 10:17:12 GMT
+            Content-Type:
+              schema:
+                type: string
+                example: application/json; charset=utf-8
+            Transfer-Encoding:
+              schema:
+                type: string
+                example: chunked
+            Connection:
+              schema:
+                type: string
+                example: keep-alive
+            Server:
+              schema:
+                type: number
+                example: nginx/1.12.1
+            X-DNS-Prefetch-Control:
+              schema:
+                type: string
+                example: 'off'
+            X-Frame-Options:
+              schema:
+                type: string
+                example: SAMEORIGIN
+            Strict-Transport-Security:
+              schema:
+                type: string
+                example: max-age=15552000; includeSubDomains
+            X-Download-Options:
+              schema:
+                type: string
+                example: noopen
+            X-Content-Type-Options:
+              schema:
+                type: string
+                example: nosniff
+            X-XSS-Protection:
+              schema:
+                type: string
+                example: 1; mode=block
+            Vary:
+              schema:
+                type: string
+                example: Origin
+            X-Response-Time:
+              schema:
+                type: string
+                example: 3ms
+            Content-Encoding:
+              schema:
+                type: string
+                example: gzip
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                - labels: >-
+                    [{"Name":"Pet","Confidence":98.60120391845703},{"Name":"Animal","Confidence":98.60120391845703},{"Name":"Mammal","Confidence":98.60120391845703},{"Name":"Cat","Confidence":98.60120391845703},{"Name":"Siamese","Confidence":93.0421142578125}]
+                  moderation_labels: '[]'
+                  vendor: AWS Rekognition
+                  approved: 1
+                  rejected: 0
+  /favourites:
+    get:
+      tags:
+        - Favourites
+      summary: /favourites
+      parameters:
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+        - name: x-api-key
+          in: header
+          schema:
+            type: string
+          required: true
+          description: ''
+          example: '{{YOUR-API-KEY}}'
+        - name: sub_id
+          in: query
+          schema:
+            type: string
+          description: >-
+            [optional] To get the favourites for only the 'sub_id' you used when
+            creating the Favourite via POST /favourites
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+    post:
+      tags:
+        - Favourites
+      summary: /favourites
+      description: >-
+
+
+        #### POST Body Parameters
+
+
+        | Key  | Required |
+        Description                                                                                    
+        |
+
+        |------|----------|-------------------------------------------------------------------------------------------------|
+
+        | image_id | required | The id of the image to favourite.
+
+        | sub_id | optional | A custom value you can set yourself, and then use
+        to split the results of GET /favourites by, e.g. your own user's
+        id.                                                    |
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                image_id: 9ccXTANkb
+                sub_id: your-user-1234
+      parameters:
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+        - name: x-api-key
+          in: header
+          schema:
+            type: string
+          required: true
+          description: ''
+          example: '{{YOUR-API-KEY}}'
+      responses:
+        '200':
+          description: OK
+          headers:
+            Date:
+              schema:
+                type: string
+                example: Thu, 08 Nov 2018 10:22:48 GMT
+            Content-Type:
+              schema:
+                type: string
+                example: application/json; charset=utf-8
+            Transfer-Encoding:
+              schema:
+                type: string
+                example: chunked
+            Connection:
+              schema:
+                type: string
+                example: keep-alive
+            Server:
+              schema:
+                type: number
+                example: nginx/1.12.1
+            X-DNS-Prefetch-Control:
+              schema:
+                type: string
+                example: 'off'
+            X-Frame-Options:
+              schema:
+                type: string
+                example: SAMEORIGIN
+            Strict-Transport-Security:
+              schema:
+                type: string
+                example: max-age=15552000; includeSubDomains
+            X-Download-Options:
+              schema:
+                type: string
+                example: noopen
+            X-Content-Type-Options:
+              schema:
+                type: string
+                example: nosniff
+            X-XSS-Protection:
+              schema:
+                type: string
+                example: 1; mode=block
+            Vary:
+              schema:
+                type: string
+                example: Origin
+            X-Response-Time:
+              schema:
+                type: string
+                example: 9ms
+            Content-Encoding:
+              schema:
+                type: string
+                example: gzip
+          content:
+            application/json:
+              schema:
+                type: object
+              examples:
+                example-0:
+                  summary: /favourites - creating a favourite with a sub_id
+                  value:
+                    message: SUCCESS
+                    id: 1708
+                example-1:
+                  summary: >-
+                    /favourites - saving a favourite to your account without a
+                    sub_id
+                  value:
+                    message: SUCCESS
+                    id: 1709
+  /favourites/{favourite_id}:
+    get:
+      tags:
+        - Favourites
+      summary: /favourites/:favourite_id
+      parameters:
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+        - name: x-api-key
+          in: header
+          schema:
+            type: string
+          required: true
+          description: ''
+          example: '{{YOUR-API-KEY}}'
+        - name: favourite_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: The id of the individual Favourite you want to get
+          example: '{{favourite_id}}'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+    delete:
+      tags:
+        - Favourites
+      summary: /favourites/:favourite_id
+      parameters:
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+        - name: x-api-key
+          in: header
+          schema:
+            type: string
+          required: true
+          description: ''
+          example: '{{YOUR-API-KEY}}'
+        - name: favourite_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: The id of the Favourite you want to delete from your account
+          example: '{{favourite_id}}'
+      responses:
+        '200':
+          description: OK
+          headers:
+            Date:
+              schema:
+                type: string
+                example: Thu, 08 Nov 2018 10:25:12 GMT
+            Content-Type:
+              schema:
+                type: string
+                example: application/json; charset=utf-8
+            Transfer-Encoding:
+              schema:
+                type: string
+                example: chunked
+            Connection:
+              schema:
+                type: string
+                example: keep-alive
+            Server:
+              schema:
+                type: number
+                example: nginx/1.12.1
+            X-DNS-Prefetch-Control:
+              schema:
+                type: string
+                example: 'off'
+            X-Frame-Options:
+              schema:
+                type: string
+                example: SAMEORIGIN
+            Strict-Transport-Security:
+              schema:
+                type: string
+                example: max-age=15552000; includeSubDomains
+            X-Download-Options:
+              schema:
+                type: string
+                example: noopen
+            X-Content-Type-Options:
+              schema:
+                type: string
+                example: nosniff
+            X-XSS-Protection:
+              schema:
+                type: string
+                example: 1; mode=block
+            Vary:
+              schema:
+                type: string
+                example: Origin
+            X-Response-Time:
+              schema:
+                type: string
+                example: 8ms
+            Content-Encoding:
+              schema:
+                type: string
+                example: gzip
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                message: SUCCESS
+  /votes:
+    get:
+      tags:
+        - Votes
+      summary: /votes
+      parameters:
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+        - name: x-api-key
+          in: header
+          schema:
+            type: string
+          required: true
+          description: ''
+          example: '{{YOUR-API-KEY}}'
+        - name: sub_id
+          in: query
+          schema:
+            type: string
+          description: >-
+            [optional] To get the votes for only the 'sub_id' you used when
+            creating the Vote via POST /votes
+      responses:
+        '200':
+          description: OK
+          headers:
+            Date:
+              schema:
+                type: string
+                example: Sun, 18 Nov 2018 11:56:11 GMT
+            Content-Type:
+              schema:
+                type: string
+                example: application/json; charset=utf-8
+            Transfer-Encoding:
+              schema:
+                type: string
+                example: chunked
+            Connection:
+              schema:
+                type: string
+                example: keep-alive
+            Server:
+              schema:
+                type: number
+                example: nginx/1.12.1
+            X-DNS-Prefetch-Control:
+              schema:
+                type: string
+                example: 'off'
+            X-Frame-Options:
+              schema:
+                type: string
+                example: SAMEORIGIN
+            Strict-Transport-Security:
+              schema:
+                type: string
+                example: max-age=15552000; includeSubDomains
+            X-Download-Options:
+              schema:
+                type: string
+                example: noopen
+            X-Content-Type-Options:
+              schema:
+                type: string
+                example: nosniff
+            X-XSS-Protection:
+              schema:
+                type: string
+                example: 1; mode=block
+            Vary:
+              schema:
+                type: string
+                example: Origin
+            Pagination-Count:
+              schema:
+                type: integer
+                example: '5665'
+            Pagination-Page:
+              schema:
+                type: integer
+                example: '0'
+            Pagination-Limit:
+              schema:
+                type: integer
+                example: '100'
+            Access-Control-Expose-Headers:
+              schema:
+                type: string
+                example: Pagination-Count, Pagination-Page, Pagination-Limit
+            X-Response-Time:
+              schema:
+                type: string
+                example: 52ms
+            Content-Encoding:
+              schema:
+                type: string
+                example: gzip
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                - id: 426
+                  image_id: c1
+                  sub_id: test
+                  value: 1
+                - id: 427
+                  image_id: c2
+                  sub_id: test
+                  value: 1
+                - id: 31098
+                  image_id: 43u
+                  sub_id: null
+                  value: 1
+                - id: 31099
+                  image_id: 4lo
+                  sub_id: null
+                  value: 0
+                - id: 31100
+                  image_id: 8rm
+                  sub_id: null
+                  value: 1
+                - id: 31101
+                  image_id: 8eq
+                  sub_id: null
+                  value: 1
+                - id: 31102
+                  image_id: 39i
+                  sub_id: null
+                  value: 1
+                - id: 31103
+                  image_id: 3mq
+                  sub_id: null
+                  value: 1
+                - id: 31104
+                  image_id: 3c4
+                  sub_id: null
+                  value: 1
+                - id: 31105
+                  image_id: 5f1
+                  sub_id: null
+                  value: 1
+                - id: 31106
+                  image_id: 9k8
+                  sub_id: null
+                  value: 1
+                - id: 31107
+                  image_id: 2dc
+                  sub_id: null
+                  value: 1
+                - id: 31108
+                  image_id: 3ne
+                  sub_id: null
+                  value: 1
+                - id: 31109
+                  image_id: 7qi
+                  sub_id: null
+                  value: 0
+                - id: 31110
+                  image_id: 5c8
+                  sub_id: null
+                  value: 0
+                - id: 31111
+                  image_id: 6s6
+                  sub_id: null
+                  value: 1
+                - id: 31112
+                  image_id: 4jd
+                  sub_id: null
+                  value: 1
+                - id: 31113
+                  image_id: 73h
+                  sub_id: null
+                  value: 1
+                - id: 31114
+                  image_id: 3j0
+                  sub_id: null
+                  value: 1
+                - id: 31400
+                  image_id: 7cu
+                  sub_id: null
+                  value: 1
+                - id: 31401
+                  image_id: 1pt
+                  sub_id: null
+                  value: 1
+                - id: 31402
+                  image_id: 9n8
+                  sub_id: null
+                  value: 1
+                - id: 31403
+                  image_id: '915'
+                  sub_id: null
+                  value: 1
+                - id: 31404
+                  image_id: '887'
+                  sub_id: null
+                  value: 1
+                - id: 31405
+                  image_id: 1k6
+                  sub_id: null
+                  value: 1
+                - id: 31406
+                  image_id: 11t
+                  sub_id: null
+                  value: 1
+                - id: 31407
+                  image_id: '575'
+                  sub_id: null
+                  value: 1
+                - id: 31408
+                  image_id: 62b
+                  sub_id: null
+                  value: 1
+                - id: 31409
+                  image_id: '148'
+                  sub_id: null
+                  value: 1
+                - id: 31411
+                  image_id: 54s
+                  sub_id: null
+                  value: 0
+                - id: 31412
+                  image_id: 2ha
+                  sub_id: null
+                  value: 0
+                - id: 31413
+                  image_id: '458'
+                  sub_id: null
+                  value: 1
+                - id: 31414
+                  image_id: 71m
+                  sub_id: null
+                  value: 1
+                - id: 31415
+                  image_id: 6gr
+                  sub_id: null
+                  value: 1
+                - id: 31416
+                  image_id: 3p4
+                  sub_id: null
+                  value: 1
+                - id: 31417
+                  image_id: 6h2
+                  sub_id: null
+                  value: 1
+                - id: 31418
+                  image_id: 6ls
+                  sub_id: null
+                  value: 1
+                - id: 31419
+                  image_id: 2am
+                  sub_id: null
+                  value: 1
+                - id: 31420
+                  image_id: 7ff
+                  sub_id: null
+                  value: 1
+                - id: 31421
+                  image_id: 7of
+                  sub_id: null
+                  value: 1
+                - id: 31422
+                  image_id: tv
+                  sub_id: null
+                  value: 1
+                - id: 31423
+                  image_id: a0
+                  sub_id: null
+                  value: 1
+                - id: 31424
+                  image_id: 2af
+                  sub_id: null
+                  value: 1
+                - id: 31425
+                  image_id: 8h
+                  sub_id: null
+                  value: 1
+                - id: 31427
+                  image_id: 1o3
+                  sub_id: null
+                  value: 1
+                - id: 31428
+                  image_id: 1hf
+                  sub_id: null
+                  value: 0
+                - id: 31429
+                  image_id: gq
+                  sub_id: null
+                  value: 1
+                - id: 31430
+                  image_id: 4nt
+                  sub_id: null
+                  value: 0
+                - id: 31431
+                  image_id: '325'
+                  sub_id: null
+                  value: 0
+                - id: 31432
+                  image_id: 4cu
+                  sub_id: null
+                  value: 1
+                - id: 31433
+                  image_id: 4en
+                  sub_id: null
+                  value: 1
+                - id: 31485
+                  image_id: 1rk
+                  sub_id: null
+                  value: 1
+                - id: 31486
+                  image_id: s3
+                  sub_id: null
+                  value: 0
+                - id: 31487
+                  image_id: 7da
+                  sub_id: null
+                  value: 1
+                - id: 31488
+                  image_id: kb
+                  sub_id: null
+                  value: 1
+                - id: 31489
+                  image_id: 6gi
+                  sub_id: null
+                  value: 1
+                - id: 31490
+                  image_id: qn
+                  sub_id: null
+                  value: 1
+                - id: 31491
+                  image_id: 5th
+                  sub_id: null
+                  value: 1
+                - id: 31492
+                  image_id: 60t
+                  sub_id: null
+                  value: 1
+                - id: 31493
+                  image_id: 2us
+                  sub_id: null
+                  value: 1
+                - id: 31494
+                  image_id: 2oa
+                  sub_id: null
+                  value: 1
+                - id: 31495
+                  image_id: 5qb
+                  sub_id: null
+                  value: 1
+                - id: 31496
+                  image_id: 77q
+                  sub_id: null
+                  value: 1
+                - id: 31497
+                  image_id: 8sj
+                  sub_id: null
+                  value: 1
+                - id: 31498
+                  image_id: 7ef
+                  sub_id: null
+                  value: 1
+                - id: 31499
+                  image_id: c0
+                  sub_id: null
+                  value: 1
+                - id: 31500
+                  image_id: qg
+                  sub_id: null
+                  value: 1
+                - id: 31501
+                  image_id: 27c
+                  sub_id: null
+                  value: 1
+                - id: 31502
+                  image_id: 35b
+                  sub_id: null
+                  value: 0
+                - id: 31503
+                  image_id: 2v1
+                  sub_id: null
+                  value: 1
+                - id: 31504
+                  image_id: '510'
+                  sub_id: null
+                  value: 1
+                - id: 31505
+                  image_id: mq
+                  sub_id: null
+                  value: 1
+                - id: 31506
+                  image_id: cj
+                  sub_id: null
+                  value: 1
+                - id: 31507
+                  image_id: 4t2
+                  sub_id: null
+                  value: 1
+                - id: 31508
+                  image_id: 3rb
+                  sub_id: null
+                  value: 1
+                - id: 31509
+                  image_id: 3q0
+                  sub_id: null
+                  value: 1
+                - id: 31510
+                  image_id: 2pq
+                  sub_id: null
+                  value: 1
+                - id: 31511
+                  image_id: 61c
+                  sub_id: null
+                  value: 1
+                - id: 31512
+                  image_id: 6ur
+                  sub_id: null
+                  value: 1
+                - id: 31513
+                  image_id: '396'
+                  sub_id: null
+                  value: 1
+                - id: 31514
+                  image_id: 8sc
+                  sub_id: null
+                  value: 1
+                - id: 31515
+                  image_id: 82e
+                  sub_id: null
+                  value: 1
+                - id: 31516
+                  image_id: 7a2
+                  sub_id: null
+                  value: 1
+                - id: 31517
+                  image_id: 3cl
+                  sub_id: null
+                  value: 1
+                - id: 31518
+                  image_id: 98k
+                  sub_id: null
+                  value: 1
+                - id: 31519
+                  image_id: 75c
+                  sub_id: null
+                  value: 1
+                - id: 31520
+                  image_id: 4s5
+                  sub_id: null
+                  value: 1
+                - id: 31521
+                  image_id: 4m2
+                  sub_id: null
+                  value: 1
+                - id: 31522
+                  image_id: bt
+                  sub_id: null
+                  value: 1
+                - id: 31523
+                  image_id: 3l9
+                  sub_id: null
+                  value: 1
+                - id: 31524
+                  image_id: 3it
+                  sub_id: null
+                  value: 1
+                - id: 31525
+                  image_id: 54j
+                  sub_id: null
+                  value: 1
+                - id: 31526
+                  image_id: 1v6
+                  sub_id: null
+                  value: 1
+                - id: 31527
+                  image_id: 1j0
+                  sub_id: null
+                  value: 0
+                - id: 31528
+                  image_id: 1eo
+                  sub_id: null
+                  value: 1
+                - id: 31529
+                  image_id: 20m
+                  sub_id: null
+                  value: 0
+                - id: 31530
+                  image_id: 31a
+                  sub_id: null
+                  value: 1
+                - id: 31531
+                  image_id: '82'
+                  sub_id: null
+                  value: 1
+                - id: 31532
+                  image_id: 8ai
+                  sub_id: null
+                  value: 0
+                - id: 31533
+                  image_id: '82'
+                  sub_id: null
+                  value: 1
+    post:
+      tags:
+        - Votes
+      summary: /votes
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              example:
+                image_id: ol
+                sub_id: my-user-1234
+                value: 1
+      parameters:
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+        - name: x-api-key
+          in: header
+          schema:
+            type: string
+          required: true
+          description: ''
+          example: '{{YOUR-API-KEY}}'
+      responses:
+        '200':
+          description: OK
+          headers:
+            Date:
+              schema:
+                type: string
+                example: Thu, 08 Nov 2018 04:06:15 GMT
+            Content-Type:
+              schema:
+                type: string
+                example: application/json; charset=utf-8
+            Transfer-Encoding:
+              schema:
+                type: string
+                example: chunked
+            Connection:
+              schema:
+                type: string
+                example: keep-alive
+            Server:
+              schema:
+                type: number
+                example: nginx/1.12.1
+            X-DNS-Prefetch-Control:
+              schema:
+                type: string
+                example: 'off'
+            X-Frame-Options:
+              schema:
+                type: string
+                example: SAMEORIGIN
+            Strict-Transport-Security:
+              schema:
+                type: string
+                example: max-age=15552000; includeSubDomains
+            X-Download-Options:
+              schema:
+                type: string
+                example: noopen
+            X-Content-Type-Options:
+              schema:
+                type: string
+                example: nosniff
+            X-XSS-Protection:
+              schema:
+                type: string
+                example: 1; mode=block
+            Vary:
+              schema:
+                type: string
+                example: Origin
+            X-Response-Time:
+              schema:
+                type: string
+                example: 27ms
+            Content-Encoding:
+              schema:
+                type: string
+                example: gzip
+          content:
+            application/json:
+              schema:
+                type: object
+              examples:
+                example-0:
+                  summary: /votes - a Down vote for image_id 'asf2'
+                  value:
+                    message: SUCCESS
+                    id: 36491
+                example-1:
+                  summary: /votes - an Up vote for image_id 'asf2' with a custom sub_id
+                  value:
+                    message: SUCCESS
+                    id: 36490
+  /votes/{vote_id}:
+    get:
+      tags:
+        - Votes
+      summary: /votes/:vote_id
+      parameters:
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+        - name: x-api-key
+          in: header
+          schema:
+            type: string
+          required: true
+          description: ''
+          example: '{{YOUR-API-KEY}}'
+        - name: vote_id
+          in: path
+          schema:
+            type: string
+          required: true
+          description: The id of the individual Vote you want to get
+          example: '{{vote_id}}'
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+    delete:
+      tags:
+        - Votes
+      summary: /votes/:vote_id
+      parameters:
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+        - name: x-api-key
+          in: header
+          schema:
+            type: string
+          required: true
+          description: ''
+          example: '{{YOUR-API-KEY}}'
+        - name: vote_id
+          in: path
+          schema:
+            type: string
+          required: true
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}
+  /categories:
+    get:
+      tags:
+        - Categories
+      summary: /categories
+      description: >-
+        Returns all the available categories to use when search for images via
+        `/v1/images/search` as the 'category_ids' parameter.
+      parameters:
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+      responses:
+        '200':
+          description: OK
+          headers:
+            Access-Control-Expose-Headers:
+              schema:
+                type: string
+                example: Pagination-Count, Pagination-Page, Pagination-Limit
+            Connection:
+              schema:
+                type: string
+                example: keep-alive
+            Content-Encoding:
+              schema:
+                type: string
+                example: gzip
+            Content-Type:
+              schema:
+                type: string
+                example: application/json; charset=utf-8
+            Date:
+              schema:
+                type: string
+                example: Wed, 29 Aug 2018 15:50:31 GMT
+            Pagination-Count:
+              schema:
+                type: integer
+                example: '11'
+            Pagination-Limit:
+              schema:
+                type: integer
+                example: '1000'
+            Pagination-Page:
+              schema:
+                type: integer
+                example: '0'
+            Server:
+              schema:
+                type: number
+                example: nginx/1.12.1
+            Strict-Transport-Security:
+              schema:
+                type: string
+                example: max-age=15552000; includeSubDomains
+            Transfer-Encoding:
+              schema:
+                type: string
+                example: chunked
+            Vary:
+              schema:
+                type: string
+                example: Origin
+            X-Content-Type-Options:
+              schema:
+                type: string
+                example: nosniff
+            X-DNS-Prefetch-Control:
+              schema:
+                type: string
+                example: 'off'
+            X-Download-Options:
+              schema:
+                type: string
+                example: noopen
+            X-Frame-Options:
+              schema:
+                type: string
+                example: SAMEORIGIN
+            X-Response-Time:
+              schema:
+                type: string
+                example: 4ms
+            X-XSS-Protection:
+              schema:
+                type: string
+                example: 1; mode=block
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                - id: 5
+                  name: boxes
+                - id: 6
+                  name: caturday
+                - id: 15
+                  name: clothes
+                - id: 9
+                  name: dream
+                - id: 3
+                  name: funny
+                - id: 1
+                  name: hats
+                - id: 10
+                  name: kittens
+                - id: 14
+                  name: sinks
+                - id: 2
+                  name: space
+                - id: 4
+                  name: sunglasses
+                - id: 7
+                  name: ties
+  /breeds:
+    get:
+      tags:
+        - Breeds
+      summary: /breeds
+      security:
+        - noauthAuth: []
+      parameters:
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+        - name: limit
+          in: query
+          schema:
+            type: integer
+          example: '10'
+        - name: page
+          in: query
+          schema:
+            type: integer
+          example: '0'
+      responses:
+        '200':
+          description: OK
+          headers:
+            Connection:
+              schema:
+                type: string
+                example: keep-alive
+            Content-Length:
+              schema:
+                type: integer
+                example: '338'
+            Content-Type:
+              schema:
+                type: string
+                example: application/json; charset=utf-8
+            Date:
+              schema:
+                type: string
+                example: Sun, 13 May 2018 13:28:57 GMT
+            Vary:
+              schema:
+                type: string
+                example: Origin
+            X-Response-Time:
+              schema:
+                type: string
+                example: 28ms
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                - id: 1
+                  name: Affenpinscher
+                - id: 2
+                  name: Afghan Hound
+                - id: 3
+                  name: African Hunting Dog
+                - id: 4
+                  name: Airedale Terrier
+                - id: 5
+                  name: Akbash Dog
+                - id: 6
+                  name: Akita
+                - id: 7
+                  name: Alapaha Blue Blood Bulldog
+                - id: 8
+                  name: Alaskan Husky
+                - id: 9
+                  name: Alaskan Malamute
+                - id: 10
+                  name: American Bulldog
+  /breeds/{breed_id}:
+    get:
+      tags:
+        - Breeds
+      summary: /breeds/:breed_id
+      security:
+        - noauthAuth: []
+      parameters:
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+        - name: breed_id
+          in: path
+          schema:
+            type: string
+          required: true
+      responses:
+        '200':
+          description: OK
+          headers:
+            Connection:
+              schema:
+                type: string
+                example: keep-alive
+            Content-Length:
+              schema:
+                type: integer
+                example: '187'
+            Content-Type:
+              schema:
+                type: string
+                example: application/json; charset=utf-8
+            Date:
+              schema:
+                type: string
+                example: Sat, 19 May 2018 12:51:33 GMT
+            Vary:
+              schema:
+                type: string
+                example: Origin
+            X-Response-Time:
+              schema:
+                type: string
+                example: 66ms
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                id: 2
+                name: Afghan Hound
+                weight: "\_50 to 60 pounds"
+                height: 25 to 27 inches at the shoulder
+                life_span: 10 to 13 years
+                bred_for: Coursing and hunting
+                breed_group: Hound
+  /sources:
+    get:
+      tags:
+        - Sources
+      summary: /sources
+      security:
+        - noauthAuth: []
+      parameters:
+        - name: Content-Type
+          in: header
+          schema:
+            type: string
+          example: application/json
+        - name: limit
+          in: query
+          schema:
+            type: integer
+          example: '10'
+        - name: page
+          in: query
+          schema:
+            type: integer
+          example: '0'
+      responses:
+        '200':
+          description: OK
+          headers:
+            X-DNS-Prefetch-Control:
+              schema:
+                type: string
+                example: 'off'
+            X-Frame-Options:
+              schema:
+                type: string
+                example: SAMEORIGIN
+            Strict-Transport-Security:
+              schema:
+                type: string
+                example: max-age=15552000; includeSubDomains
+            X-Download-Options:
+              schema:
+                type: string
+                example: noopen
+            X-Content-Type-Options:
+              schema:
+                type: string
+                example: nosniff
+            X-XSS-Protection:
+              schema:
+                type: string
+                example: 1; mode=block
+            Vary:
+              schema:
+                type: string
+                example: Origin
+            Pagination-Count:
+              schema:
+                type: integer
+                example: '31'
+            Pagination-Page:
+              schema:
+                type: integer
+                example: '0'
+            Pagination-Limit:
+              schema:
+                type: integer
+                example: '10'
+            Access-Control-Expose-Headers:
+              schema:
+                type: string
+                example: Pagination-Count, Pagination-Page, Pagination-Limit
+            Cache-Control:
+              schema:
+                type: string
+                example: public, max-age=12800
+            Content-Type:
+              schema:
+                type: string
+                example: application/json; charset=utf-8
+            X-Response-Time:
+              schema:
+                type: string
+                example: 1ms
+            Content-Length:
+              schema:
+                type: integer
+                example: '795'
+            Date:
+              schema:
+                type: string
+                example: Wed, 05 Dec 2018 05:39:18 GMT
+            Connection:
+              schema:
+                type: string
+                example: keep-alive
+          content:
+            application/json:
+              schema:
+                type: object
+              example:
+                - id: 1
+                  name: Wikipedia
+                  url: https://en.wikipedia.org
+                  breed_id: null
+                - id: 2
+                  name: VCA Hospitals
+                  url: https://vcahospitals.com
+                  breed_id: null
+                - id: 3
+                  name: VetStreet
+                  url: http://www.vetstreet.com
+                  breed_id: null
+                - id: 4
+                  name: PetHelpful
+                  url: https://pethelpful.com/
+                  breed_id: null
+                - id: 5
+                  name: Bengal cat club
+                  url: https://bengalcatclub.com
+                  breed_id: beng
+                - id: 6
+                  name: Pet MD
+                  url: https://www.petmd.com
+                  breed_id: null
+                - id: 7
+                  name: PETAZI
+                  url: https://petazi.com
+                  breed_id: null
+                - id: 8
+                  name: CatTime
+                  url: https://cattime.com
+                  breed_id: null
+                - id: 10
+                  name: The Governing Council of the Cat Fancy
+                  url: https://www.gccfcats.org
+                  breed_id: null
+                - id: 12
+                  name: Hillspet
+                  url: https://www.hillspet.com.au
+                  breed_id: null
+  /:
+    get:
+      tags:
+        - default
+      summary: version
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json: {}

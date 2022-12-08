@@ -1,0 +1,22 @@
+openapi: 3.0.3
+info:
+  title: test open api parsing for POST-operation
+  version: 0.0.1
+paths:
+  /users/:
+    post:
+      requestBody:
+        content:
+          'application/json':
+            schema:
+              $ref: '#/components/schemas/user'
+          'application/xml':
+            schema:
+              $ref: '#/components/schemas/user'
+      responses:
+        '200':
+          description: OK
+components:
+  schemas:
+    user:
+      type: integer

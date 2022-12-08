@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name">Open API Explorer</string>
+    <string name="user_input_requested">Your input needed</string>
+    <string name="copy_to_clipboard_title">More Information</string>
+    <string name="copy_to_clipboard_toast_title">copied</string>
+    <string name="operation_selection_title">Please select your operation</string>
+    <string name="select_specification_button">Select Open API Specification to use.</string>
+    <string name="main_section_apis_title">APIs</string>
+    <string name="main_section_calls_title">Calls</string>
+    <string name="generic_error_title">Error</string>
+</resources>
