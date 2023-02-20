@@ -128,14 +128,13 @@ class MainActivity : ComponentActivity() {
 
     @Composable
     private fun ErrorMessage(error: String) {
-        Column {
-            Text(
-                fontSize = 34.sp,
-                fontWeight = FontWeight.Bold,
-                text = stringResource(R.string.generic_error_title)
-            )
-            Text(error)
-        }
+        val toast = Toast.makeText(applicationContext, error, Toast.LENGTH_LONG)
+        toast.addCallback(object : Toast.Callback() {
+            override fun onToastHidden() {
+                viewmodel.error.value = ""
+            }
+        })
+        toast.show()
     }
 
     @Composable
