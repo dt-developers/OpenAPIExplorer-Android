@@ -60,9 +60,9 @@ fun UserParameterInput(
                             value = text,
                             maxLines = 1,
                             onValueChange = { changedValue ->
-                            text = changedValue
-                            parameters = parameters.mute(key, changedValue)
-                        })
+                                text = changedValue
+                                parameters = parameters.mute(key, changedValue)
+                            })
                     }
                 }
             }
@@ -75,6 +75,7 @@ fun UserApiSelectionDialog(
     dialog: UserDialog.SelectAPIsDialog,
     dismissed: () -> Unit,
     selected: (selected: String) -> Unit,
+    loadFromFile: () -> Unit,
 ) {
     AlertDialog(
         confirmButton = {
@@ -84,6 +85,11 @@ fun UserApiSelectionDialog(
         },
         onDismissRequest = dismissed,
         title = { Text(stringResource(R.string.operation_selection_title)) },
+        dismissButton = {
+            Button(onClick = loadFromFile) {
+                Text(stringResource(R.string.load_from_file))
+            }
+        },
         text = {
             LazyColumn {
                 items(dialog.availableAPIs) { api ->

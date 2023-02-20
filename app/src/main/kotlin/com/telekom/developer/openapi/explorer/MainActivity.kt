@@ -4,16 +4,19 @@ package com.telekom.developer.openapi.explorer
 
 import android.content.ClipData
 import android.content.ClipboardManager
+import android.net.Uri
 import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -24,12 +27,11 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.ExperimentalTextApi
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.sp
 import com.telekom.developer.openapi.explorer.model.ApiCall
 import com.telekom.developer.openapi.explorer.ui.OpenAPIView
 import com.telekom.developer.openapi.explorer.ui.UserApiSelectionDialog
@@ -144,6 +146,16 @@ class MainActivity : ComponentActivity() {
 
     @Composable
     private fun UserDialog(dialog: UserDialog) {
+        val selectedFileUri = remember { mutableStateOf<Uri?>(null) }
+        val launcher = rememberLauncherForActivityResult(ActivityResultContracts.OpenDocument()) {
+            selectedFileUri.value = it
+        }
+
+        selectedFileUri.value?.let { uri ->
+            viewmodel.loadAPIFromUri(uri)
+            viewmodel.dialog.value = null
+        }
+
         when (dialog) {
             is UserInputDialog -> {
                 UserParameterInput(
@@ -164,10 +176,14 @@ class MainActivity : ComponentActivity() {
             is SelectAPIsDialog -> UserApiSelectionDialog(
                 dialog = dialog,
                 dismissed = { viewmodel.dialog.value = null },
-                selected = { file ->
+                selected = { asset ->
                     viewmodel.dialog.value = null
-                    viewmodel.loadAPIFromAssets(file)
-                }
+                    viewmodel.loadAPIFromAssets(asset)
+                },
+                loadFromFile = {
+                    selectedFileUri.value = null
+                    launcher.launch(arrayOf("*/*"))
+                },
             )
         }
     }

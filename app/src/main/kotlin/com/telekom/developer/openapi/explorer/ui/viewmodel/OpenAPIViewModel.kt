@@ -1,6 +1,7 @@
 package com.telekom.developer.openapi.explorer.ui.viewmodel
 
 import android.app.Application
+import android.net.Uri
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
@@ -23,7 +24,12 @@ import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.Response
 import okio.Buffer
+import java.io.File
 import java.util.concurrent.TimeUnit
+
+private const val PREFERENCES_LAST_API_ASSET = "lastAPAsset"
+private const val PREFERENCES_LAST_API_WAS_FROM_ASSETS = "lastAPIFromAssets"
+private const val PRIVATE_LAST_API_CACHE_FILE = "last_loaded_api.yml"
 
 class OpenAPIViewModel(
     application: Application,
@@ -65,32 +71,82 @@ class OpenAPIViewModel(
 
 
     fun loadLastAPI() {
-        sharedPreferences.getString("lastAPI", null)?.let { lastAPI ->
-            loadAPIFromAssets(
-                lastAPI
-            )
+        val path = sharedPreferences.getString(PREFERENCES_LAST_API_ASSET, null)
+
+        if (path != null) {
+            val fromAssets =
+                sharedPreferences.getBoolean(PREFERENCES_LAST_API_WAS_FROM_ASSETS, false)
+
+            if (fromAssets) {
+                loadAPIFromAssets(path)
+            } else {
+                loadAPIFromUri(
+                    Uri.parse(
+                        "file://${getApplication<Application>().filesDir}" +
+                                "/${PRIVATE_LAST_API_CACHE_FILE}"
+                    )
+                )
+            }
         }
     }
 
-    fun loadAPIFromAssets(file: String) {
+    fun loadAPIFromUri(uri: Uri) {
+        val app = getApplication<Application>()
+        val stream = app.contentResolver.openInputStream(uri)
+        if (stream != null) {
+            val body = String(bytes = stream.readBytes())
+            stream.close()
+
+            val file = File(app.filesDir, PRIVATE_LAST_API_CACHE_FILE)
+            file.writeText(body)
+
+            if (parseApiBody(body)) {
+                sharedPreferences.edit()
+                    .putBoolean(PREFERENCES_LAST_API_WAS_FROM_ASSETS, false)
+                    .apply()
+
+                apiCalls.value = listOf()
+            } // no error checking here, it is done in the parser method
+        } else {
+            error.value = "Couldn't open stream."
+        }
+    }
+
+    fun loadAPIFromAssets(asset: String) {
         error.value = ""
         apiCalls.value = emptyList()
 
         val apiBody = getApplication<Application>().assets
-            .open(file)
+            .open(asset)
             .reader()
             .readText()
 
-        try {
+        if (parseApiBody(apiBody)) {
+            sharedPreferences.edit()
+                .putBoolean(PREFERENCES_LAST_API_WAS_FROM_ASSETS, true)
+                .putString(PREFERENCES_LAST_API_ASSET, asset)
+                .apply()
+
+            apiCalls.value = listOf()
+        }
+    }
+
+    private fun parseApiBody(apiBody: String): Boolean {
+        return try {
             api.value = OpenApiParser.parse(apiBody)
-            sharedPreferences.edit().putString("lastAPI", file).apply()
+            true
         } catch (noResolution: CouldNotResolveReferenceException) {
             error.value = noResolution.reference
+            false
         } catch (missing: MissingRequiredPropertyException) {
             error.value =
-                "${missing.message}\n\nline: ${missing.line}:${missing.column}\n${missing.path.toHumanReadableString()}"
+                "${missing.message}\n\n" +
+                        "line: ${missing.line}:${missing.column}\n" +
+                        missing.path.toHumanReadableString()
+            false
         } catch (throwable: Throwable) {
             error.value = throwable.localizedMessage ?: throwable.message ?: throwable.toString()
+            false
         }
     }
 
