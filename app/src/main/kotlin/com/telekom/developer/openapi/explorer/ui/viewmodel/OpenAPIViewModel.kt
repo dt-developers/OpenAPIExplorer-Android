@@ -258,9 +258,9 @@ class OpenAPIViewModel(
 
             val url = "${getBaseUrl(userParameters)}$uri"
                 .resolveUrlParameters(operation, userParameters)
-            var builder = Request.Builder().url(url)
 
             try {
+                var builder = Request.Builder().url(url)
                 builder = when (method) {
                     Operation.GET -> builder.get()
                     Operation.POST -> builder.post(operation.toRequestBody(userParameters))

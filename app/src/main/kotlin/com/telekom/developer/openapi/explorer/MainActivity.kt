@@ -201,8 +201,7 @@ class MainActivity : ComponentActivity() {
             this,
             getString(R.string.copy_to_clipboard_toast_title),
             Toast.LENGTH_SHORT
-        )
-            .show()
+        ).show()
     }
 
     private fun loadClicked() {
