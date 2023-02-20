@@ -58,6 +58,12 @@ class OpenAPIViewModel(
         )
     }
 
+    fun clearAPI() {
+        api.value = null
+        apiCalls.value = listOf()
+    }
+
+
     fun loadLastAPI() {
         sharedPreferences.getString("lastAPI", null)?.let { lastAPI ->
             loadAPIFromAssets(

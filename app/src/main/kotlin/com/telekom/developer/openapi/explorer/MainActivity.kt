@@ -80,6 +80,11 @@ class MainActivity : ComponentActivity() {
                             IconButton(onClick = ::loadClicked) {
                                 Icon(Icons.Filled.Add, null)
                             }
+                            if (viewmodel.api.value != null) {
+                                IconButton(onClick = ::clearClicked) {
+                                    Icon(Icons.Filled.Delete, null)
+                                }
+                            }
                         }
                     )
                 },
@@ -186,5 +191,9 @@ class MainActivity : ComponentActivity() {
 
     private fun loadClicked() {
         viewmodel.listAPIsInAssets()
+    }
+
+    private fun clearClicked() {
+        viewmodel.clearAPI()
     }
 }
