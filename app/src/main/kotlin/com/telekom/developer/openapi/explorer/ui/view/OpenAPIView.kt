@@ -15,6 +15,7 @@ import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Done
 import androidx.compose.material.icons.filled.List
 import androidx.compose.material.icons.filled.Search
@@ -46,6 +47,7 @@ fun OpenAPIView(
     toggleClicked: (index: Int) -> Unit,
     copyText: (text: String) -> Unit,
     loadClicked: () -> Unit,
+    deleteCallsClicked: () -> Unit,
 ) {
     val listState = rememberLazyListState()
 
@@ -85,7 +87,10 @@ fun OpenAPIView(
 
             if (apiCalls.isNotEmpty()) {
                 itemSpacer()
-                headerItem(titleId = R.string.main_section_calls_title)
+                headerItem(
+                    titleId = R.string.main_section_calls_title,
+                    delete = deleteCallsClicked
+                )
                 callItems(
                     apiCalls,
                     api.paths.size * 1000,
@@ -145,18 +150,36 @@ private fun CreateScrollers(
     )
 }
 
-private fun LazyListScope.headerItem(title: String? = null, @StringRes titleId: Int? = null) {
+private fun LazyListScope.headerItem(
+    title: String? = null,
+    @StringRes titleId: Int? = null,
+    delete: (() -> Unit)? = null
+) {
     item {
-        Text(
-            fontSize = 34.sp,
-            fontWeight = FontWeight.Bold,
-            lineHeight = 36.sp,
-            text = if (titleId != null) {
-                stringResource(id = titleId)
-            } else {
-                title.orEmpty()
+        Row {
+            Text(
+                fontSize = 34.sp,
+                fontWeight = FontWeight.Bold,
+                lineHeight = 36.sp,
+                text = if (titleId != null) {
+                    stringResource(id = titleId)
+                } else {
+                    title.orEmpty()
+                }
+            )
+            if (delete != null) {
+                Spacer(modifier = Modifier.weight(1f))
+                IconButton(
+                    modifier = Modifier.padding(4.dp),
+                    onClick = delete
+                ) {
+                    Icon(
+                        Icons.Filled.Delete,
+                        contentDescription = null
+                    )
+                }
             }
-        )
+        }
     }
 }
 

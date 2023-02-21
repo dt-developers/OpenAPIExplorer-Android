@@ -66,6 +66,10 @@ class OpenAPIViewModel(
 
     fun clearAPI() {
         api.value = null
+        clearAPICalls()
+    }
+
+    fun clearAPICalls() {
         apiCalls.value = listOf()
     }
 
@@ -105,7 +109,7 @@ class OpenAPIViewModel(
                     .putBoolean(PREFERENCES_LAST_API_WAS_FROM_ASSETS, false)
                     .apply()
 
-                apiCalls.value = listOf()
+                clearAPICalls()
             } // no error checking here, it is done in the parser method
         } else {
             error.value = "Couldn't open stream."
@@ -127,7 +131,7 @@ class OpenAPIViewModel(
                 .putString(PREFERENCES_LAST_API_ASSET, asset)
                 .apply()
 
-            apiCalls.value = listOf()
+            clearAPICalls()
         }
     }
 

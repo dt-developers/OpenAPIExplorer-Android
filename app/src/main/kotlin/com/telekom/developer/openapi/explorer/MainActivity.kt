@@ -106,7 +106,8 @@ class MainActivity : ComponentActivity() {
                             },
                             toggleClicked = ::toggled,
                             copyText = ::copyTextToClipboard,
-                            loadClicked = ::loadClicked
+                            loadClicked = ::loadClicked,
+                            deleteCallsClicked = { viewmodel.clearAPICalls() },
                         )
 
                         if (dialog != null) {
