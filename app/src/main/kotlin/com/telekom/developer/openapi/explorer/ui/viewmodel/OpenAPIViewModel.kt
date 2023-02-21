@@ -50,6 +50,13 @@ class OpenAPIViewModel(
 
     private val client = OkHttpClient.Builder()
         .callTimeout(10, TimeUnit.SECONDS)
+        .addInterceptor { chain ->
+            val request = chain.request()
+            val response = chain.proceed(request)
+            Log.d("OKHTTP:REQ", request.toString())
+            Log.d("OKHTTP:RESP", response.toString())
+            response
+        }
         .build()
 
     fun listAPIsInAssets() {
