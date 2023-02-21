@@ -379,7 +379,7 @@ class OpenAPIViewModel(
                     }
                 }
             } else {
-                throw ClassNotFoundException("Could not find json content type.")
+                throw ClassNotFoundException("Could not find content type.")
             }
         } else {
             throw IllegalStateException("No request body given, but expected.")
