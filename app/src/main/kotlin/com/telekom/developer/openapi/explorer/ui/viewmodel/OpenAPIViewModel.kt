@@ -66,6 +66,7 @@ class OpenAPIViewModel(
 
     fun clearAPI() {
         api.value = null
+        sharedPreferences.edit().putString(PREFERENCES_LAST_API_ASSET, null).apply()
         clearAPICalls()
     }
 
