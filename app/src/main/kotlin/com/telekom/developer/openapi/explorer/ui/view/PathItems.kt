@@ -1,4 +1,4 @@
-package com.telekom.developer.openapi.explorer.ui
+package com.telekom.developer.openapi.explorer.ui.view
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row

@@ -33,9 +33,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.ExperimentalTextApi
 import com.telekom.developer.openapi.explorer.model.ApiCall
-import com.telekom.developer.openapi.explorer.ui.OpenAPIView
-import com.telekom.developer.openapi.explorer.ui.UserApiSelectionDialog
-import com.telekom.developer.openapi.explorer.ui.UserParameterInput
+import com.telekom.developer.openapi.explorer.ui.view.OpenAPIView
+import com.telekom.developer.openapi.explorer.ui.view.UserApiSelectionDialog
+import com.telekom.developer.openapi.explorer.ui.view.UserParameterInput
 import com.telekom.developer.openapi.explorer.ui.model.UserDialog
 import com.telekom.developer.openapi.explorer.ui.model.UserDialog.SelectAPIsDialog
 import com.telekom.developer.openapi.explorer.ui.model.UserDialog.UserInputDialog
