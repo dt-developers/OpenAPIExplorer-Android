@@ -46,14 +46,29 @@ fun LazyListScope.callItems(
                         color = TMagenta,
                         text = "Request"
                     )
-                    Text(
-                        fontWeight = FontWeight.ExtraLight,
-                        text = call.requestBody,
-                        maxLines = 10,
-                    )
+
+                    if (call.requestHeaders.isNotEmpty()) {
+                        Text(text = "Headers")
+                        for ((key, values) in call.requestHeaders) {
+                            Text(
+                                fontWeight = FontWeight.ExtraLight,
+                                text = "$key: ${values.joinToString { it.ellipsize() }}",
+                                maxLines = 10,
+                            )
+                        }
+                    }
+
+                    if (call.responseBody.isNotEmpty()) {
+                        Spacer(modifier = Modifier.size(8.dp))
+                        Text(text = "Body")
+                        Text(
+                            fontWeight = FontWeight.ExtraLight,
+                            text = call.requestBody,
+                            maxLines = 10,
+                        )
+                    }
 
                     Spacer(modifier = Modifier.size(8.dp))
-
                     Text(
                         color = TMagenta,
                         text = "Response"
@@ -89,3 +104,6 @@ fun LazyListScope.callItems(
         }
     }
 }
+
+private fun String.ellipsize(max: Int = 16, ellipsis: String = "…") =
+    "${take(max - ellipsis.length)}${if (length > max - ellipsis.length) ellipsis else ""}"

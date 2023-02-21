@@ -283,6 +283,7 @@ class OpenAPIViewModel(
                         apiCalls.value = apiCalls.value + ApiCall(
                             method,
                             getBaseUrl(userParameters),
+                            call.request().headers().toMultimap(),
                             call.request().body()?.string() ?: "",
                             503,
                             th.message ?: "<NETWORK NOT AVAILABLE>"
@@ -437,13 +438,25 @@ fun Schema.toFormBodyWithParameters(
     return builder.build()
 }
 
-private fun Response.toApiCall(): ApiCall = ApiCall(
-    api = request().url().toString(),
-    method = request().method(),
-    requestBody = request().body()?.string() ?: "",
-    responseCode = code(),
-    responseBody = body()?.string() ?: "<empty>",
-)
+private fun Response.toApiCall(): ApiCall {
+    val bodyString = body()?.string()
+    val sanitizedBody = if (!bodyString.isNullOrEmpty()) {
+        bodyString
+    } else if (message().isNotBlank()) {
+        message()
+    } else {
+        "<empty>"
+    }
+
+    return ApiCall(
+        api = request().url().toString(),
+        method = request().method(),
+        requestHeaders = request().headers().toMultimap(),
+        requestBody = request().body()?.string() ?: "",
+        responseCode = code(),
+        responseBody = sanitizedBody,
+    )
+}
 
 private fun okhttp3.RequestBody.string(): String {
     val sink = Buffer()

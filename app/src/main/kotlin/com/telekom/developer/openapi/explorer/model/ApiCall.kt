@@ -6,6 +6,7 @@ import kotlinx.serialization.Serializable
 data class ApiCall(
     val method: String,
     val api: String,
+    val requestHeaders: Map<String, List<String>>,
     val requestBody: String,
     val responseCode: Int,
     val responseBody: String,
