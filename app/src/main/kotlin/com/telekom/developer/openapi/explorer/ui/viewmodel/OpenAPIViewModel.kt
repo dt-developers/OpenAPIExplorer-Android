@@ -459,7 +459,7 @@ fun Schema.toFormBodyWithParameters(
 ): FormBody {
     val builder = FormBody.Builder()
     for (name in properties?.keys.orEmpty()) {
-        builder.add(name, userParameters[name] ?: "")
+        builder.add(name, userParameters["application/x-www-form-urlencoded.$name"] ?: "")
     }
     return builder.build()
 }
