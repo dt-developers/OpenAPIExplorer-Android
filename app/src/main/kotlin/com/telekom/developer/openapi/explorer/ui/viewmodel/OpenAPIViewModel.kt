@@ -2,6 +2,7 @@ package com.telekom.developer.openapi.explorer.ui.viewmodel
 
 import android.app.Application
 import android.net.Uri
+import android.util.Log
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
@@ -201,7 +202,20 @@ class OpenAPIViewModel(
             }
         }
 
-        for (parameter in operation.parameters ?: emptyList()) {
+        for ((key, auth) in api.value?.components?.securitySchemes.orEmpty()) {
+            if (key == "auth") {
+                result[key] = UserInput(
+                    name = auth.name ?: key,
+                    required = true,
+                    details = auth.description,
+                    previous = previousUserInput(key, "")
+                )
+            } else {
+                Log.d(javaClass.name, "Unsupported authorization found: $key.")
+            }
+        }
+
+        for (parameter in operation.parameters.orEmpty()) {
             val key = parameter.name
             result[key] =
                 UserInput(
@@ -271,6 +285,18 @@ class OpenAPIViewModel(
                     Operation.POST -> builder.post(operation.toRequestBody(userParameters))
                     Operation.DELETE -> builder.delete()
                     else -> builder
+                }
+
+                if (api.value?.components?.securitySchemes.orEmpty().containsKey("auth")) {
+                    val auth = api.value?.components?.securitySchemes.orEmpty()["auth"]
+                    if (auth != null && auth.location == "header") {
+                        val token = userParameters["auth"].orEmpty()
+
+                        builder.addHeader(
+                            auth.name ?: "X-API-KEY",
+                            token
+                        )
+                    }
                 }
 
                 val request = builder.build()

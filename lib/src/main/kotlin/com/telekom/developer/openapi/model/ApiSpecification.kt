@@ -2,7 +2,6 @@ package com.telekom.developer.openapi.model
 
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.SerialName
-import java.io.Serial
 
 @Serializable
 data class Info(
@@ -109,10 +108,26 @@ data class Path(
     val delete: Operation? = null,
 )
 
+
+@Serializable
+data class SecurityScheme(
+    val name: String? = null,
+    val type: String? = null,
+    val description: String? = null,
+    @SerialName("in")
+    val location: String? = null
+)
+
+@Serializable
+data class Components(
+    val securitySchemes: Map<String, SecurityScheme>? = null,
+)
+
 @Serializable
 data class ApiSpecification(
     val openapi: String,
     val info: Info,
     val paths: Map<String, Path>,
     val servers: List<Server>? = null,
+    val components: Components? = null,
 )

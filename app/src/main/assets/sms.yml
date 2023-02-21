@@ -1,44 +1,50 @@
 openapi: 3.0.0
 info:
-  title: Programmable Communications SMS API
-  version: 1.1.0
+  title: SMS API
+  version: 1.1.7
   contact:
-    name: T Developers Support
+    name: Deutsche Telekom Developer Support
     email: developers@telekom.de
     url: https://developer.telekom.com
   termsOfService: https://developer.telekom.com/terms-and-conditions
-  description: DT Programmable Communications API based on the documentation available at https://developer.telekom.com/products/sms-api.
+  description: Deutsche Telekom Programmable Communications SMS API based on the documentation available at the Telekom for Developers portal.
   license:
     name: MIT
-    url: https://opensource.org/licenses/MIT
+    url: 'https://opensource.org/licenses/MIT'
 paths:
   /messages:
+    parameters: []
     post:
-      summary: Send a SMS message.
+      summary: Send SMS message
       description: Sends a new SMS and returns its representation.
-      operationId: post-sms-messages
+      operationId: post-SMS-Messages
       responses:
         '200':
           $ref: '#/components/responses/send-sms-response'
+        '415':
+          $ref: '#/components/responses/error-response-415'
+        '422':
+          $ref: '#/components/responses/error-response-422'
       requestBody:
         $ref: '#/components/requestBodies/send-sms-request'
-  /messages/{messageId}:
+  '/messages/{MessageSid}':
     parameters:
       - schema:
           type: string
           pattern: '^[0-9a-f]*$'
-        name: messageId
+        name: MessageSid
         in: path
         required: true
-        description: The id of the message to be retrieved.
+        description: The SID of the message to be retrieved.
     get:
-      summary: Get single SMS information.
+      summary: Get single SMS Information.
       responses:
         '200':
           $ref: '#/components/responses/send-sms-response'
-      operationId: get-sms-messages-messageId
+      operationId: get-SMS-Messages-MessageSid
       description: Get single SMS information.
 components:
+  schemas: {}
   securitySchemes:
     auth:
       name: X-API-Key
@@ -56,22 +62,18 @@ components:
                 type: string
                 description: Telephone number in E.164 format, Sender ID, or short code.
                 example: '+19876543212'
-                maxLength: 14
+                maxLength: 16
+                pattern: '^\+[1-9][0-9]{1,14}$|^[\w\.\-\+\*\,\#]{1,11}$'
               To:
                 type: string
-                pattern: '^\+[1-9]\d{1,14}$'
+                pattern: '^\+[1-9][0-9]{1,14}$'
                 description: Telephone number in E.164 format.
                 example: '+19876543212'
-                maxLength: 14
+                maxLength: 16
               Body:
                 type: string
                 description: Text body of the SMS message.
                 example: Test SMS
-              StatusCallback:
-                type: string
-                description: A URL to send a webhook requests to notify on any message status event.
-                example: 'http://status.callback.url'
-                nullable: true
             required:
               - From
               - To
@@ -87,29 +89,67 @@ components:
             properties:
               sid:
                 type: string
-                description: SMS message identifier.
+                description: The SMS message identifier.
               date_created:
                 type: string
+                description: The date representation of when this resource was created.
               date_updated:
                 type: string
+                description: The date on which this resource was last updated.
               from:
                 type: string
+                description: Telephone number in E.164 format, Sender ID, or short code.
               to:
                 type: string
+                description: Telephone number in E.164 format.
               body:
                 type: string
+                description: Text body of the SMS message.
               status:
                 type: string
+                description: The status of the Message.
+                enum:
+                  - accepted
+                  - queued
+                  - undelivered
+                  - received
+                  - sending
+                  - sent
+                  - delivered
+                  - failed
               direction:
                 type: string
+                description: The direction of the request.
+                enum:
+                  - outbound-api
               api_version:
                 type: string
+                description: The version of the SMS API that handled the request.
+                pattern: ^(\d+\.)?(\d+\.)?(\d+)$
               uri:
                 type: string
+                description: The suffix for the HTTP resource, relative to the base domain.
+                pattern: '^\/[^\/](.*)$'
+              num_segments:
+                type: integer
+                description: Amount of text messages needed for delivering the body in the respective encoding.
+            required:
+              - sid
+              - date_created
+              - date_updated
+              - from
+              - to
+              - body
+              - status
+              - direction
+              - num_segments
+              - api_version
+              - uri
           examples:
             example:
               value:
                 sid: 6362552fc8f06f1a9884030b
+                num_segments: 1
                 date_created: 'Fri, 23 Sep 2022 11:42:37 +0100'
                 date_updated: 'Fri, 23 Sep 2022 11:42:39 +0100'
                 from: '+19876543212'
@@ -119,5 +159,98 @@ components:
                 direction: outbound-api
                 api_version: 1.1.0
                 uri: /service/sms/v1/messages/6362552fc8f06f1a9884030b
+    error-response-415:
+      description: Format of error response.
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              timestamp:
+                type: string
+                description: The timestamp of the error response.
+              path:
+                type: string
+                description: The path for the requested resource, relative to the base domain.
+              status:
+                type: integer
+                description: The HTTP error code of the response.
+              error:
+                type: string
+                description: The HTTP description of the error.
+              message:
+                type: string
+                description: Additional description of the error explaining why the request has been rejected.
+              requestId:
+                type: string
+                description: ID of the request.
+            required:
+              - timestamp
+              - path
+              - status
+              - error
+              - message
+              - requestId
+          examples:
+            example:
+              value:
+                timestamp: 2022-12-15T00:20:11.096+00:00
+                path: /sms/v1/messages
+                status: 415
+                error: Unsupported Media Type
+                message: "Content type '' not supported"
+                requestId: 2f4a538d-2578
+    error-response-422:
+      description: Format of error response.
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              timestamp:
+                type: string
+                description: The timestamp of the error response.
+              path:
+                type: string
+                description: The path for the requested resource, relative to the base domain.
+              status:
+                type: integer
+                description: The HTTP error code of the response.
+              error:
+                type: string
+                description: The HTTP description of the error.
+              message:
+                type: string
+                description: Additional description of the error explaining why the request has been rejected.
+              requestId:
+                type: string
+                description: ID of the request.
+            required:
+              - timestamp
+              - path
+              - status
+              - error
+              - message
+              - requestId
+          examples:
+            example-1:
+              value:
+                timestamp: 2022-12-12T13:32:21.937+00:00
+                path: /sms/v1/messages
+                status: 422
+                error: Unprocessable Entity
+                message: "Number: +48535255115 cannot be used because is not verified"
+                requestId: 54856401-192
+            example-2:
+              value:
+                timestamp: 2022-12-15T00:21:47.221+00:00
+                path: /sms/v1/messages
+                status: 422
+                error: Unprocessable Entity
+                message: Not enough money on the wallet
+                requestId: 6a7c704c-8354
+  examples: {}
+security:
+  - auth: []
 servers:
-  - url: 'https://api.developer.telekom.com/service/sms/v1'
+  - url: https://api.telekom.com/service/sms/v1

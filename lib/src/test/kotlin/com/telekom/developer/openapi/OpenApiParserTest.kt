@@ -61,4 +61,31 @@ class OpenApiParserTest {
             specification.paths["/users/"]?.post?.requestBody?.content?.values?.first()?.schema?.type
         )
     }
+
+    @Test
+    fun `can understand security schemes`() {
+        val simpleFileContent = loadFile("post_with_references_and_security_scheme.yml")
+
+        val specification = OpenApiParser.parse(simpleFileContent)
+
+        assertEquals(
+            2,
+            specification.components?.securitySchemes?.size
+        )
+
+        assertEquals(
+            "X-API-Key",
+            specification.components?.securitySchemes?.get("auth")?.name
+        )
+
+        assertEquals(
+            "header",
+            specification.components?.securitySchemes?.get("auth")?.location
+        )
+
+        assertEquals(
+            "oauth2",
+            specification.components?.securitySchemes?.get("oAuth2ClientCredentials")?.type
+        )
+    }
 }

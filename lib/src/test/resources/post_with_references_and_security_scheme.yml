@@ -1,0 +1,34 @@
+openapi: 3.0.3
+info:
+  title: test open api parsing for POST-operation
+  version: 0.0.1
+paths:
+  /users/:
+    post:
+      requestBody:
+        content:
+          'application/json':
+            schema:
+              $ref: '#/components/schemas/user'
+          'application/xml':
+            schema:
+              $ref: '#/components/schemas/user'
+      responses:
+        '200':
+          description: OK
+components:
+  securitySchemes:
+    auth:
+      name: X-API-Key
+      type: apiKey
+      in: header
+    oAuth2ClientCredentials:
+      type: oauth2
+      description: This API uses OAuth 2 with the client credentials grant flow.
+      flows:
+        clientCredentials:
+          tokenUrl: "{tokenUrl}"
+          scopes: { }
+  schemas:
+    user:
+      type: integer
