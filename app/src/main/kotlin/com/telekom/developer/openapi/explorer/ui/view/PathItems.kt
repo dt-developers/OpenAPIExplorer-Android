@@ -153,6 +153,7 @@ private fun SchemaDescription(
                             )
                         ) {
                             append(name)
+                            append('*')
                         }
                     } else {
                         append(name)
