@@ -79,12 +79,13 @@ class MainActivity : ComponentActivity() {
                     TopAppBar(
                         title = { Text(stringResource(id = R.string.app_name)) },
                         actions = {
-                            IconButton(onClick = ::loadClicked) {
-                                Icon(Icons.Filled.Add, null)
-                            }
                             if (viewmodel.api.value != null) {
                                 IconButton(onClick = ::clearClicked) {
                                     Icon(Icons.Filled.Delete, null)
+                                }
+                            } else {
+                                IconButton(onClick = ::loadClicked) {
+                                    Icon(Icons.Filled.Add, null)
                                 }
                             }
                         }
